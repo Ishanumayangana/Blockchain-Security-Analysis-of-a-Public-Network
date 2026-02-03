@@ -1,0 +1,12 @@
+web3
+pandas
+numpy
+scikit-learn
+networkx
+matplotlib
+plotly
+seaborn
+jupyter
+notebook
+streamlit
+streamlit-option-menu

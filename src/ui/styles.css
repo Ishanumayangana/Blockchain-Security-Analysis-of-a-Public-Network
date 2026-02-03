@@ -1,0 +1,159 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
+/* Global Styles - Light Mode */
+.stApp {
+    background-color: #F8F9FA;
+    background-image: radial-gradient(circle at 50% 10%, #E9ECEF 0%, #F8F9FA 70%);
+    font-family: 'Outfit', sans-serif;
+    color: #212529;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #343A40 !important;
+}
+
+/* Gradient Text for Main Title */
+h1 {
+    background: linear-gradient(90deg, #007BFF 0%, #00C4CC 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+p,
+div,
+span,
+label {
+    font-family: 'Outfit', sans-serif;
+    color: #495057;
+}
+
+.stMarkdown {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Sidebar Styling */
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF;
+    border-right: 1px solid #DEE2E6;
+}
+
+/* Custom Metrics Cards (Glassmorphism - Light) */
+div[data-testid="metric-container"] {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.1);
+    border-color: #007BFF;
+}
+
+/* Metric Labels */
+div[data-testid="metric-container"] label {
+    color: #6C757D !important;
+}
+
+/* Value Color in Metrics */
+div[data-testid="stMetricValue"] {
+    font-family: 'JetBrains Mono', monospace;
+    color: #007BFF !important;
+    text-shadow: none;
+}
+
+/* Buttons */
+.stButton>button {
+    background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
+    color: white !important;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1.2rem;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.stButton>button:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+    background: linear-gradient(135deg, #0056b3 0%, #004494 100%);
+    color: white !important;
+}
+
+/* Inputs */
+.stTextInput>div>div>input {
+    background-color: #FFFFFF;
+    color: #212529;
+    border: 1px solid #CED4DA;
+    border-radius: 8px;
+}
+
+.stTextInput>div>div>input:focus {
+    border-color: #007BFF;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+    border-bottom: 2px solid #DEE2E6;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    border-radius: 8px 8px 0 0;
+    color: #6C757D;
+    background-color: transparent;
+    transition: color 0.3s ease;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: transparent;
+    color: #007BFF;
+    border-bottom: 2px solid #007BFF;
+}
+
+/* Plotly Charts */
+.js-plotly-plot .plotly .modebar {
+    display: none !important;
+}
+
+/* Custom Alert Boxes */
+.stAlert {
+    background-color: #FFF3CD;
+    border: 1px solid #FFEEBA;
+    border-radius: 12px;
+    color: #856404;
+}
+
+.stSuccess {
+    background-color: #D4EDDA;
+    color: #155724;
+}
+
+.stError {
+    background-color: #F8D7DA;
+    color: #721C24;
+}
+
+.stInfo {
+    background-color: #D1ECF1;
+    color: #0C5460;
+}
