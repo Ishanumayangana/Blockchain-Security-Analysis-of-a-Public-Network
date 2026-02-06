@@ -22,6 +22,11 @@ The project features a **modern Web Interface** built with Streamlit for interac
 - **Sybil Detection**: Identifies suspicious clusters of accounts with high clustering coefficients.
 - **Visualization**: Interactive 2D graph with legend distinguishing normal vs. suspicious nodes.
 
+### 4. Gas Monitor & MEV Detection (New)
+- **Sandwich Attacks**: Detects front-running patterns where bots exploit user trades.
+- **Gas Anomalies**: Identifies transactions with abnormal gas prices (>2 standard deviations).
+- **Reporting**: Export analysis results to CSV for external auditing.
+
 ## 💻 Web Interface
 A professional, light-themed dashboard allows you to run simulations and view results in real-time.
 
@@ -55,6 +60,7 @@ The app will open in your browser at `http://localhost:8501`.
     - `attacks/`: Modules for Mining, Contracts, and Network analysis.
     - `ui/`: Authentication and Styling assets.
     - `data_loader.py`: Synthetic data generation and web3 connection.
+    - `gas_analysis.py`: Gas price and MEV detection logic.
 - `notebooks/`: Jupyter notebooks for standalone research and prototyping.
 
 ## 📊 Technologies Used
