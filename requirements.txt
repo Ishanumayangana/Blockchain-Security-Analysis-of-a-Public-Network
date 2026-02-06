@@ -1,12 +1,11 @@
-web3
+streamlit
 pandas
 numpy
+plotly
 scikit-learn
 networkx
 matplotlib
-plotly
 seaborn
-jupyter
-notebook
-streamlit
+web3
 streamlit-option-menu
+streamlit-lottie

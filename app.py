@@ -14,7 +14,24 @@ from src.ui.auth import simple_login
 import src.data_loader as dl
 import src.attacks.mining_attack as ma
 import src.attacks.contract_vuln as cv
+import src.attacks.contract_vuln as cv
 import src.attacks.network_analysis as na
+import src.attacks.gas_analysis as ga
+import requests
+from streamlit_lottie import st_lottie
+
+# --- ASSETS & HELPERS ---
+def load_lottieurl(url: str):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+def convert_df_to_csv(df):
+    return df.to_csv(index=False).encode('utf-8')
+
+lottie_chain = load_lottieurl("https://assets5.lottiefiles.com/packages/lf20_jcikwtux.json")
+lottie_search = load_lottieurl("https://assets9.lottiefiles.com/packages/lf20_5njp3vgg.json")
 
 # --- CACHED FUNCTIONS ---
 @st.cache_data
@@ -56,8 +73,8 @@ with st.sidebar:
     st.markdown("## 🛡️ Security Suite")
     selected = option_menu(
         menu_title=None,
-        options=["Home", "51% Attack", "Smart Contract Ops", "Network Forensics"],
-        icons=["house", "cpu", "file-code", "diagram-3"],
+        options=["Home", "51% Attack", "Smart Contract Ops", "Network Forensics", "Gas & MEV"],
+        icons=["house", "cpu", "file-code", "diagram-3", "fuel-pump"],
         default_index=0,
         styles={
             "container": {"padding": "0!important", "background-color": "transparent"},
@@ -110,6 +127,9 @@ if selected == "Home":
     st.markdown("#### Recent Alerts")
     st.warning("⚠️ High Mining Centralization detected (Gini > 0.7)")
     st.info("ℹ️ 5 suspicious Sybil clusters identified in last scan.")
+
+    if lottie_chain:
+        st_lottie(lottie_chain, height=200, key="chain_anim")
 
 # --- PAGE: 51% ATTACK ---
 elif selected == "51% Attack":
@@ -338,3 +358,58 @@ elif selected == "Network Forensics":
             })
         st.table(pd.DataFrame(cluster_data))
 
+        st.table(pd.DataFrame(cluster_data))
+
+# --- PAGE: GAS & MEV ---
+elif selected == "Gas & MEV":
+    st.title("⛽ Gas Monitor & MEV Detection")
+    st.info("Detect Front-running bots (Sandwich Attacks) and Gas anomalies.")
+    
+    col_input, col_kpi = st.columns([1,2])
+    
+    with col_input:
+        st.subheader("Analysis Scope")
+        blocks = st.slider("Block Range", 50, 500, 100)
+        st.caption("Analyzes recent blocks for gas price spikes and ordering patterns.")
+        
+        run_mev = st.button("Run MEV Scan")
+        
+        if lottie_search:
+            st_lottie(lottie_search, height=150, key="search_anim")
+            
+    with col_kpi:
+        if run_mev:
+            # Get Data
+            df_g = get_transaction_data(blocks * 5, True) # Reuse tx gen with gas
+            
+            # Analyze
+            df_anom = ga.detect_gas_anomalies(df_g)
+            mev_list = ga.detect_front_running(df_g)
+            
+            # KPIs
+            k1, k2, k3 = st.columns(3)
+            avg_gas = df_g['gas_price'].mean()
+            k1.metric("Avg Gas Price", f"{avg_gas:.2f} Gwei")
+            k2.metric("Gas Spikes (>2σ)", len(df_anom[df_anom['is_anomaly']]))
+            k3.metric("Sandwich Attacks", len(mev_list), delta_color="inverse")
+            
+            # Visuals
+            st.subheader("Gas Price Volatility")
+            fig = px.scatter(df_g, x='block_number', y='gas_price', 
+                             color='is_anomaly', title="Gas Price Distribution",
+                             color_discrete_map={True: '#FF4B4B', False: '#00ADB5'})
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # MEV Table
+            if mev_list:
+                st.subheader("🚨 Detected Sandwich Attacks")
+                st.dataframe(pd.DataFrame(mev_list))
+                
+            # Report Download
+            csv = convert_df_to_csv(df_g)
+            st.download_button(
+                label="📥 Download Analysis Report",
+                data=csv,
+                file_name="gas_mev_analysis.csv",
+                mime="text/csv",
+            )

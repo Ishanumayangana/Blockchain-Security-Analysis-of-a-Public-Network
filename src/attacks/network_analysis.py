@@ -8,7 +8,7 @@ def build_transaction_graph(df):
     """
     G = nx.DiGraph()
     for _, row in df.iterrows():
-        G.add_edge(row['from'], row['to'], weight=row['value'])
+        G.add_edge(row['from_address'], row['to_address'], weight=row['value'])
     return G
 
 def analyze_network_metrics(G):

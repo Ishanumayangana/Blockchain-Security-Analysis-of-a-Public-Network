@@ -97,29 +97,57 @@ def generate_synthetic_transaction_network(num_tx=500, sybil_scenario=False):
     accounts = [f"0xUser{i}" for i in range(50)]
     data = []
     
-    for _ in range(num_tx):
-        sender = np.random.choice(accounts)
-        receiver = np.random.choice(accounts)
-        while receiver == sender:
-            receiver = np.random.choice(accounts)
-            
-        value = np.random.exponential(1.5) # Ether
-        data.append({'from': sender, 'to': receiver, 'value': value})
-        
+    df = pd.DataFrame({
+        'from_address': [f"0x{np.random.randint(100, 999)}" for _ in range(num_tx)],
+        'to_address': [f"0x{np.random.randint(100, 999)}" for _ in range(num_tx)],
+        'value': np.random.exponential(1.5, num_tx),
+        'block_number': np.random.randint(100000, 100010, num_tx),
+        'transaction_index': np.random.randint(0, 50, num_tx),
+        'gas_price': np.random.normal(20, 5, num_tx), # Gwei
+        'hash': [f"0xTx{i}" for i in range(num_tx)]
+    })
+    
+    # Inject Sybil Patterns
     if sybil_scenario:
-        # Create a Sybil cluster: One controller sending to many fake accounts
-        controller = "0xSybilController"
-        fake_accounts = [f"0xFake{i}" for i in range(20)]
-        for fake in fake_accounts:
-            # Funding the Sybils
-            data.append({'from': controller, 'to': fake, 'value': 10.0})
-            # Sybils interacting with each other
-            for _ in range(3):
-                target = np.random.choice(fake_accounts)
-                if target != fake:
-                    data.append({'from': fake, 'to': target, 'value': 0.5})
-                    
-    return pd.DataFrame(data)
+        # Create a "Ring" of transactions
+        sybil_accounts = [f"0xSybil{i}" for i in range(5)]
+        for i in range(len(sybil_accounts)):
+            df = pd.concat([df, pd.DataFrame([{
+                'from_address': sybil_accounts[i],
+                'to_address': sybil_accounts[(i+1) % len(sybil_accounts)],
+                'value': 10.0,
+                'block_number': 100005,
+                'transaction_index': 100+i,
+                'gas_price': 20.0,
+                'hash': f"0xSybilTx{i}"
+            }])], ignore_index=True)
+            
+    # Inject Front-Running (Sandwich) Patterns
+    # High Gas Buy -> Victim -> High Gas Sell
+    attacker = "0xMEVBot"
+    victim = "0xVictim"
+    
+    sandwich_block = 100008
+    
+    # Front-run (Buy)
+    df = pd.concat([df, pd.DataFrame([{
+        'from_address': attacker, 'to_address': "0xDex", 'value': 50,
+        'block_number': sandwich_block, 'transaction_index': 1, 'gas_price': 150.0, 'hash': "0xSandwichBuy"
+    }])], ignore_index=True)
+    
+    # Victim
+    df = pd.concat([df, pd.DataFrame([{
+        'from_address': victim, 'to_address': "0xDex", 'value': 5,
+        'block_number': sandwich_block, 'transaction_index': 2, 'gas_price': 50.0, 'hash': "0xVictimTx"
+    }])], ignore_index=True)
+    
+    # Back-run (Sell)
+    df = pd.concat([df, pd.DataFrame([{
+        'from_address': attacker, 'to_address': "0xDex", 'value': 50,
+        'block_number': sandwich_block, 'transaction_index': 3, 'gas_price': 140.0, 'hash': "0xSandwichSell"
+    }])], ignore_index=True)
+
+    return df
 
 def generate_synthetic_contract_data(n_samples=1000):
     """
